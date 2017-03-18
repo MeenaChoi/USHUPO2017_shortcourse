@@ -328,8 +328,8 @@ ggplot(aes(x=Group, y=mean, colour=Group), data=summaryresult)+
 # Be careful for setting quantile for two-sided. need to divide by two for error.
 # For example, 95% confidence interval, right tail is 2.5% and left tail is 2.5%.
 
-summaryresult$ciw.lower.95 <- summaryresult$mean - qt(0.975,summaryresult$len)*summaryresult$se
-summaryresult$ciw.upper.95 <- summaryresult$mean + qt(0.975,summaryresult$len)*summaryresult$se
+summaryresult$ciw.lower.95 <- summaryresult$mean - qt(0.975,summaryresult$len-1)*summaryresult$se
+summaryresult$ciw.upper.95 <- summaryresult$mean + qt(0.975,summaryresult$len-1)*summaryresult$se
 summaryresult
 
 # mean with 95% two-sided confidence interval
@@ -349,8 +349,8 @@ ggplot(aes(x=Group, y=mean, colour=Group), data=summaryresult)+
 # Let's repeat that one more time for the 99% two-sided confidence interval. 
 
 # mean with 99% two-sided confidence interval
-summaryresult$ciw.lower.99 <- summaryresult$mean - qt(0.995,summaryresult$len)*summaryresult$se
-summaryresult$ciw.upper.99 <- summaryresult$mean + qt(0.995,summaryresult$len)*summaryresult$se
+summaryresult$ciw.lower.99 <- summaryresult$mean - qt(0.995,summaryresult$len-1)*summaryresult$se
+summaryresult$ciw.upper.99 <- summaryresult$mean + qt(0.995,summaryresult$len-1)*summaryresult$se
 summaryresult
 
 ggplot(aes(x=Group, y=mean, colour=Group), data=summaryresult)+
@@ -380,20 +380,20 @@ ggplot(aes(x=Group, y=mean, colour=Group), data=summaryresult)+
 
 # First, get two conditions only, because t.test only works for two groups (conditions).
 oneproteindata.condition12 <- oneproteindata[which(oneproteindata$Condition %in% 
-                                                     c('Condition1', 'Condition2')), ]
+                                                     c('Condition1', 'Condition4')), ]
 unique(oneproteindata.condition12$Condition)
 unique(oneproteindata$Condition)
 
 # t test for different abundance (log2Int) between Groups (Condition)
 result <- t.test(oneproteindata.condition12$Log2Intensity ~ oneproteindata.condition12$Condition,
-                 var.equal=TRUE)
+                 var.equal=FALSE)
 # show the summary of t-test including confidence interval level with 0.95
 result
 
 # We can redo the t-test and change the confidence interval level for the log2 fold change.
 
 result.ci90 <- t.test(oneproteindata.condition12$Log2Intensity ~ oneproteindata.condition12$Condition, 
-                      var.equal=TRUE, 
+                      var.equal=FALSE, 
                       conf.level=0.9)
 result.ci90
 
@@ -434,8 +434,13 @@ result$conf.int
 
 summaryresult
 
+summaryresult12 <- summaryresult[c(1,4), ]
+
 # test statistic, It is the same as 'result$statistic' above.
-diff(summaryresult$mean)/sqrt(sum(summaryresult$sd^2/summaryresult$length))
+diff(summaryresult12$mean) # same as result$estimate[1]-result$estimate[2]
+sqrt(sum(summaryresult12$sd^2/summaryresult12$length)) # same as stand error
+
+diff(summaryresult12$mean)/sqrt(sum(summaryresult12$sd^2/summaryresult12$length))
 
 
 #############################################
